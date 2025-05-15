@@ -1,0 +1,248 @@
+.butce-takip-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.butce-ozet-kartlar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.ozet-kart {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.ozet-kart.gelir {
+    border-left: 4px solid #4CAF50;
+}
+
+.ozet-kart.gider {
+    border-left: 4px solid #f44336;
+}
+
+.ozet-kart.bakiye {
+    border-left: 4px solid #2196F3;
+}
+
+.grafik-alani {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    position: relative;
+    height: auto;
+    min-height: 500px;
+    width: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.grafik-alani h3 {
+    margin: 0 0 20px 0;
+    padding: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.grafik-container {
+    position: relative;
+    height: 460px;
+    width: 100%;
+    padding: 10px 0;
+}
+
+#butce-grafik {
+    width: 100% !important;
+    height: 100% !important;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;
+}
+
+/* Grafik alanı için responsive tasarım */
+@media (max-width: 768px) {
+    .grafik-alani {
+        padding: 15px;
+        min-height: 400px;
+    }
+
+    .grafik-container {
+        height: 360px;
+    }
+}
+
+.islem-formu {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.islem-formu h3 {
+    margin: 0 0 20px 0;
+    padding: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.islem-formu form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.islem-formu select,
+.islem-formu input,
+.islem-formu textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.islem-formu select {
+    height: 45px;
+    cursor: pointer;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23444" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 20px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.islem-formu select:focus,
+.islem-formu input:focus,
+.islem-formu textarea:focus {
+    outline: none;
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+}
+
+.islem-formu select option {
+    padding: 10px;
+}
+
+.islem-formu input[type="number"],
+.islem-formu input[type="date"] {
+    height: 45px;
+}
+
+.islem-formu textarea {
+    grid-column: span 2;
+    resize: vertical;
+    min-height: 100px;
+}
+
+.islem-formu button {
+    grid-column: span 2;
+    height: 45px;
+    font-size: 15px;
+    font-weight: 500;
+    background-color: #2271b1;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.islem-formu button:hover {
+    background-color: #135e96;
+}
+
+@media (max-width: 768px) {
+    .islem-formu form {
+        grid-template-columns: 1fr;
+    }
+
+    .islem-formu textarea,
+    .islem-formu button {
+        grid-column: span 1;
+    }
+}
+
+.son-islemler {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.son-islemler-baslik {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.islem-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.islem-item:last-child {
+    border-bottom: none;
+}
+
+.islem-item.gelir .islem-tutar {
+    color: #4CAF50;
+}
+
+.islem-item.gider .islem-tutar {
+    color: #f44336;
+}
+
+.islem-detay {
+    display: flex;
+    flex-direction: column;
+}
+
+.islem-detay strong {
+    margin-bottom: 5px;
+}
+
+.islem-detay span {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.islem-detay p {
+    color: #666;
+    font-size: 0.9em;
+    margin: 5px 0 0;
+}
+
+.no-islem {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+@media (max-width: 768px) {
+    .butce-ozet-kartlar {
+        grid-template-columns: 1fr;
+    }
+
+    .islem-formu form {
+        grid-template-columns: 1fr;
+    }
+
+    .islem-formu textarea,
+    .islem-formu button {
+        grid-column: span 1;
+    }
+}
