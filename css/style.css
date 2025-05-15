@@ -32,60 +32,112 @@
 
 .grafik-alani {
     background: #fff;
-    padding: 20px;
-    border-radius: 8px;
+    padding: 25px;
+    border-radius: 12px;
     margin-bottom: 30px;
     position: relative;
-    height: 400px;
+    height: auto;
+    min-height: 500px;
     width: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.grafik-alani h3 {
+    margin: 0 0 20px 0;
+    padding: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
 }
 
 .grafik-container {
     position: relative;
-    height: 360px;
+    height: 460px;
     width: 100%;
+    padding: 10px 0;
 }
 
 #butce-grafik {
     width: 100% !important;
     height: 100% !important;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;
+}
+
+/* Grafik alanı için responsive tasarım */
+@media (max-width: 768px) {
+    .grafik-alani {
+        padding: 15px;
+        min-height: 400px;
+    }
+
+    .grafik-container {
+        height: 360px;
+    }
 }
 
 .islem-formu {
     background: #fff;
-    padding: 20px;
-    border-radius: 8px;
+    padding: 25px;
+    border-radius: 12px;
     margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.islem-formu h3 {
+    margin: 0 0 20px 0;
+    padding: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
 }
 
 .islem-formu form {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 20px;
 }
 
 .islem-formu select,
 .islem-formu input,
 .islem-formu textarea {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 8px;
     background-color: #fff;
     font-size: 14px;
+    transition: all 0.3s ease;
 }
 
 .islem-formu select {
-    height: 40px;
+    height: 45px;
+    cursor: pointer;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23444" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 20px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.islem-formu select:focus,
+.islem-formu input:focus,
+.islem-formu textarea:focus {
+    outline: none;
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
 }
 
 .islem-formu select option {
-    padding: 8px;
+    padding: 10px;
 }
 
 .islem-formu input[type="number"],
 .islem-formu input[type="date"] {
-    height: 40px;
+    height: 45px;
 }
 
 .islem-formu textarea {
@@ -96,9 +148,30 @@
 
 .islem-formu button {
     grid-column: span 2;
-    height: 40px;
-    font-size: 14px;
+    height: 45px;
+    font-size: 15px;
     font-weight: 500;
+    background-color: #2271b1;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.islem-formu button:hover {
+    background-color: #135e96;
+}
+
+@media (max-width: 768px) {
+    .islem-formu form {
+        grid-template-columns: 1fr;
+    }
+
+    .islem-formu textarea,
+    .islem-formu button {
+        grid-column: span 1;
+    }
 }
 
 .son-islemler {

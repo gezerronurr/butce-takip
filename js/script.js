@@ -48,29 +48,49 @@ jQuery(document).ready(function($) {
         });
     });
 
-    // İşlem tipi değiştiğinde kategorileri filtrele
+     // İşlem tipi değiştiğinde kategorileri filtrele
     $('select[name="islem_tipi"]').on('change', function() {
         const secilenTip = $(this).val();
         const kategoriSelect = $('select[name="kategori"]');
         
-        // Tüm kategorileri gizle
-        kategoriSelect.find('option').hide();
-        kategoriSelect.find('option:first').show();
+        // Önce tüm kategorileri göster
+        kategoriSelect.find('option').show();
         
         if (secilenTip) {
-            // Seçilen tipe uygun kategorileri göster
-            kategoriSelect.find('option[data-tip="' + secilenTip + '"]').show();
+            // Seçilen tipe uygun olmayan kategorileri gizle
+            kategoriSelect.find('option').not('[data-tip="' + secilenTip + '"]').not(':first').hide();
         }
         
-        // Seçili kategoriyi sıfırla
+        // Kategori seçimini sıfırla
         kategoriSelect.val('');
     });
+});
 
-    // Sayfa yüklendiğinde kategorileri gizle
-    $(document).ready(function() {
-        const kategoriSelect = $('select[name="kategori"]');
-        kategoriSelect.find('option').not(':first').hide();
-    });
+// Form gönderiminde hata kontrolü
+$('#yeni-islem-formu').on('submit', function(e) {
+    const islemTipi = $('select[name="islem_tipi"]').val();
+    const kategori = $('select[name="kategori"]').val();
+    
+    if (!islemTipi) {
+        alert('Lütfen bir işlem tipi seçin.');
+        e.preventDefault();
+        return false;
+    }
+    
+    if (!kategori) {
+        alert('Lütfen bir kategori seçin.');
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Sayfa yüklendiğinde işlem tipine göre kategorileri filtrele
+$(document).ready(function() {
+    const secilenTip = $('select[name="islem_tipi"]').val();
+    if (secilenTip) {
+        $('select[name="islem_tipi"]').trigger('change');
+    }
+});
 
     // Verileri güncelleme fonksiyonu
     function verileriGuncelle() {
@@ -101,99 +121,136 @@ jQuery(document).ready(function($) {
         });
     }
 
-    // Grafiği güncelleme fonksiyonu
-    function updateChart(data) {
-        if (window.butceGrafik) {
-            window.butceGrafik.destroy();
-        }
+   // Grafiği güncelleme fonksiyonu
+function updateChart(data) {
+    if (window.butceGrafik) {
+        window.butceGrafik.destroy();
+    }
 
-        const ctx = document.getElementById('butce-grafik').getContext('2d');
-        
-        // Canvas piksel oranını ayarla
-        const dpr = window.devicePixelRatio || 1;
-        const canvas = ctx.canvas;
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        ctx.scale(dpr, dpr);
-        canvas.style.width = rect.width + 'px';
-        canvas.style.height = rect.height + 'px';
+    const ctx = document.getElementById('butce-grafik').getContext('2d');
+    
+    // Yüksek DPI için canvas ayarları
+    const dpr = window.devicePixelRatio || 1;
+    const canvas = ctx.canvas;
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    
+    // Canvas boyutunu 2 katına çıkar (daha keskin görüntü için)
+    const parent = canvas.parentNode;
+    canvas.width = parent.offsetWidth * 2;
+    canvas.height = parent.offsetHeight * 2;
+    ctx.scale(2, 2);
 
-        window.butceGrafik = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: data.labels,
-                datasets: [
-                    {
-                        label: 'Gelir',
-                        backgroundColor: '#4CAF50',
-                        data: data.gelirler,
-                        borderRadius: 4
-                    },
-                    {
-                        label: 'Gider',
-                        backgroundColor: '#f44336',
-                        data: data.giderler,
-                        borderRadius: 4
-                    }
-                ]
+    window.butceGrafik = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.labels,
+            datasets: [
+                {
+                    label: 'Gelir',
+                    backgroundColor: 'rgba(76, 175, 80, 0.8)',
+                    borderColor: '#4CAF50',
+                    borderWidth: 1,
+                    data: data.gelirler,
+                    borderRadius: 6,
+                    barThickness: 30,
+                    maxBarThickness: 35
+                },
+                {
+                    label: 'Gider',
+                    backgroundColor: 'rgba(244, 67, 54, 0.8)',
+                    borderColor: '#f44336',
+                    borderWidth: 1,
+                    data: data.giderler,
+                    borderRadius: 6,
+                    barThickness: 30,
+                    maxBarThickness: 35
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            devicePixelRatio: 2,
+            layout: {
+                padding: {
+                    top: 20,
+                    right: 25,
+                    bottom: 20,
+                    left: 25
+                }
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                aspectRatio: 2,
-                devicePixelRatio: dpr,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.1)'
-                        },
-                        ticks: {
-                            font: {
-                                size: 12
-                            },
-                            callback: function(value) {
-                                return '₺' + formatNumber(value);
-                            }
-                        }
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        lineWidth: 1
                     },
-                    x: {
-                        grid: {
-                            display: false
+                    ticks: {
+                        font: {
+                            size: 13,
+                            weight: '500'
                         },
-                        ticks: {
-                            font: {
-                                size: 12
-                            }
+                        padding: 10,
+                        callback: function(value) {
+                            return '₺' + formatNumber(value);
                         }
                     }
                 },
-                plugins: {
-                    legend: {
-                        labels: {
-                            font: {
-                                size: 14
-                            }
-                        }
+                x: {
+                    grid: {
+                        display: false
                     },
-                    tooltip: {
-                        titleFont: {
-                            size: 14
+                    ticks: {
+                        font: {
+                            size: 13,
+                            weight: '500'
                         },
-                        bodyFont: {
-                            size: 13
+                        padding: 10
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    align: 'center',
+                    labels: {
+                        padding: 20,
+                        font: {
+                            size: 14,
+                            weight: '600'
                         },
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ₺' + formatNumber(context.raw);
-                            }
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    padding: 12,
+                    cornerRadius: 6,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ₺' + formatNumber(context.raw);
                         }
                     }
                 }
+            },
+            animation: {
+                duration: 750,
+                easing: 'easeInOutQuart'
             }
-        });
-    }
+        }
+    });
+}
 
     // Son işlemleri güncelleme fonksiyonu
     function updateSonIslemler(islemler) {

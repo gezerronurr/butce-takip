@@ -89,58 +89,77 @@ class ButceTakipSistemi {
     }
 
     // Plugin aktivasyonu
-    public function activate_plugin() {
-        global $wpdb;
-        
-        $charset_collate = $wpdb->get_charset_collate();
-        
-        // İşlemler tablosu
-        $sql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}butce_islemler (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            islem_tipi varchar(50) NOT NULL,
-            kategori varchar(100) NOT NULL,
-            tutar decimal(10,2) NOT NULL,
-            tarih date NOT NULL,
-            aciklama text,
-            created_at timestamp DEFAULT CURRENT_TIMESTAMP,
-            updated_at timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY  (id)
-        ) $charset_collate;";
-        
-        // Kategoriler tablosu
-        $sql .= "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}butce_kategoriler (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            kategori_adi varchar(100) NOT NULL,
-            islem_tipi varchar(50) NOT NULL,
-            created_at timestamp DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY  (id),
-            UNIQUE KEY kategori_adi (kategori_adi)
-        ) $charset_collate;";
-        
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
+public function activate_plugin() {
+    global $wpdb;
+    
+    $charset_collate = $wpdb->get_charset_collate();
+    
+    // İşlemler tablosu
+    $sql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}butce_islemler (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        islem_tipi varchar(50) NOT NULL,
+        kategori varchar(100) NOT NULL,
+        tutar decimal(10,2) NOT NULL,
+        tarih date NOT NULL,
+        aciklama text,
+        olusturma_tarihi timestamp DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY  (id)
+    ) $charset_collate;";
+    
+    // Kategoriler tablosu
+    $sql .= "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}butce_kategoriler (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        kategori_adi varchar(100) NOT NULL,
+        tur varchar(50) NOT NULL,
+        olusturma_tarihi timestamp DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY  (id),
+        UNIQUE KEY kategori_adi (kategori_adi)
+    ) $charset_collate;";
+    
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
 
-        // Varsayılan kategorileri ekle
-        $varsayilan_kategoriler = array(
-            array('Maaş', 'gelir'),
-            array('Ek Gelir', 'gelir'),
-            array('Kira', 'gider'),
-            array('Market', 'gider'),
-            array('Faturalar', 'gider'),
-            array('Ulaşım', 'gider')
+    // Varsayılan kategorileri ekle
+    $varsayilan_kategoriler = array(
+        // Gelir Kategorileri
+        array('Maaş', 'gelir'),
+        array('Ek Gelir', 'gelir'),
+        array('Yatırım Geliri', 'gelir'),
+        array('Kira Geliri', 'gelir'),
+        array('Freelance Gelir', 'gelir'),
+        array('Prim', 'gelir'),
+        array('Diğer Gelirler', 'gelir'),
+        
+        // Gider Kategorileri
+        array('Kira', 'gider'),
+        array('Market', 'gider'),
+        array('Faturalar', 'gider'),
+        array('Ulaşım', 'gider'),
+        array('Sağlık', 'gider'),
+        array('Eğitim', 'gider'),
+        array('Eğlence', 'gider'),
+        array('Alışveriş', 'gider'),
+        array('Yemek', 'gider'),
+        array('Sigorta', 'gider'),
+        array('Aidat', 'gider'),
+        array('Elektronik', 'gider'),
+        array('Spor', 'gider'),
+        array('Bakım', 'gider'),
+        array('Hediye', 'gider'),
+        array('Diğer Giderler', 'gider')
+    );
+
+    foreach ($varsayilan_kategoriler as $kategori) {
+        $wpdb->replace(
+            $wpdb->prefix . 'butce_kategoriler',
+            array(
+                'kategori_adi' => $kategori[0],
+                'tur' => $kategori[1]
+            ),
+            array('%s', '%s')
         );
-
-        foreach ($varsayilan_kategoriler as $kategori) {
-            $wpdb->replace(
-                $wpdb->prefix . 'butce_kategoriler',
-                array(
-                    'kategori_adi' => $kategori[0],
-                    'islem_tipi' => $kategori[1]
-                ),
-                array('%s', '%s')
-            );
-        }
     }
+}
 
     // Plugin deaktivasyonu
     public function deactivate_plugin() {
@@ -148,27 +167,61 @@ class ButceTakipSistemi {
     }
 
     // Yeni işlem kaydetme (AJAX)
-    public function kaydet_butce_islemi() {
-        try {
-            // Nonce kontrolü
-            if (!check_ajax_referer('butce_takip_nonce', 'nonce', false)) {
-                wp_send_json_error(array(
-                    'message' => 'Güvenlik doğrulaması başarısız.',
-                    'debug' => 'Nonce verification failed'
-                ));
-                return;
-            }
-            
-            // Yetki kontrolü
-            if (!current_user_can('manage_options')) {
-                wp_send_json_error(array(
-                    'message' => 'Yetkiniz bulunmamaktadır.',
-                    'debug' => 'Insufficient permissions'
-                ));
-                return;
-            }
-            
-            global $wpdb;
+public function kaydet_butce_islemi() {
+    try {
+        // Nonce kontrolü
+        if (!check_ajax_referer('butce_takip_nonce', 'nonce', false)) {
+            wp_send_json_error(array('message' => 'Güvenlik doğrulaması başarısız.'));
+            return;
+        }
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Yetkiniz bulunmamaktadır.'));
+            return;
+        }
+        
+        global $wpdb;
+        
+        $data = array(
+            'islem_tipi' => isset($_POST['islem_tipi']) ? sanitize_text_field($_POST['islem_tipi']) : '',
+            'kategori' => isset($_POST['kategori']) ? sanitize_text_field($_POST['kategori']) : '',
+            'tutar' => isset($_POST['tutar']) ? floatval(str_replace(',', '.', $_POST['tutar'])) : 0,
+            'tarih' => isset($_POST['tarih']) ? sanitize_text_field($_POST['tarih']) : '',
+            'aciklama' => isset($_POST['aciklama']) ? sanitize_textarea_field($_POST['aciklama']) : ''
+        );
+
+        // Kategori kontrolü
+        $kategori_kontrol = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}butce_kategoriler WHERE kategori_adi = %s AND tur = %s",
+            $data['kategori'],
+            $data['islem_tipi']
+        ));
+
+        if (!$kategori_kontrol) {
+            wp_send_json_error(array('message' => 'Geçersiz kategori seçimi.'));
+            return;
+        }
+
+        $result = $wpdb->insert(
+            $wpdb->prefix . 'butce_islemler',
+            $data,
+            array('%s', '%s', '%f', '%s', '%s')
+        );
+
+        if ($result === false) {
+            wp_send_json_error(array('message' => 'Veritabanı hatası: ' . $wpdb->last_error));
+            return;
+        }
+
+        wp_send_json_success(array(
+            'message' => 'İşlem başarıyla kaydedildi.',
+            'id' => $wpdb->insert_id
+        ));
+
+    } catch (Exception $e) {
+        wp_send_json_error(array('message' => 'Beklenmeyen bir hata oluştu.'));
+    }
+}
             
             // POST verilerini al ve temizle
             $data = array(
